@@ -1,0 +1,9 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: rubrik-backup-recovery-cluster-role
+rules:
+# Required for backup/recovery of all resources in the cluster
+- apiGroups: ["*"]
+  resources: ["*"]
+  verbs: ["get", "list", "create"]
