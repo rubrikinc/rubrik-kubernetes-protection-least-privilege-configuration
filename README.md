@@ -2,6 +2,8 @@
 
 To ensure security and compliance, it's important to assign the least privileges necessary for Rubrik to perform its tasks. This repository provides Kubernetes ClusterRole and Role definitions that encapsulate these permissions for utilizing Rubrik Kubernetes Protection.
 
+Follow the instructions in the [Documentation](Documentation.md) for configuring the required permissions.
+
 ## :blue_book: Roles and ClusterRoles
 
 - **[rubrik-kubeconfig-cluster-role-for-openshift](cluster-roles/rubrik-kubeconfig-cluster-role-for-openshift.yml)**: *ClusterRole* with permissions required at a cluster level for the Rubrik Kubeconfig User on Redhat Openshift Clusters.
