@@ -10,13 +10,13 @@
 
 - [Step 1: Create a Kubeconfig](#step-1-create-a-kubeconfig)
 
-- [Step 2: Assign cluster-scoped and backup/recovery permissions to the Kubeconfig](#step-2-assign-cluster-scoped-and-backup-recovery-permissions-to-the-kubeconfig)
+- [Step 2: Assign cluster-scoped and backup/recovery permissions to the Kubeconfig](#step-2-assign-cluster-scoped-and-backuprecovery-permissions-to-the-kubeconfig)
 
-  - [I. Create a ClusterRole with the provided definition](#create-a-clusterrole-with-the-provided-definition)
+  - [I. Create a ClusterRole with the provided definition](#i-create-a-clusterrole-with-the-provided-definition)
 
-  - [II. Grant Kubeconfig User these ClusterRole permissions with a ClusterRoleBinding](#grant-kubeconfig-user-these-clusterrole-permissions-with-a-clusterrolebinding)
+  - [II. Grant Kubeconfig User these ClusterRole permissions with a ClusterRoleBinding](#ii-grant-kubeconfig-user-these-clusterrole-permissions-with-a-clusterrolebinding)
 
-  - [III. Configure Backup/Recovery permissions for the Kubeconfig User](#configure-backup-recovery-permissions-for-the-kubeconfig-user)
+  - [III. Configure Backup/Recovery permissions for the Kubeconfig User](#iii-configure-backuprecovery-permissions-for-the-kubeconfig-user)
 
     - [Option A: Protection for All Resources in the Cluster](#option-a-protection-for-all-resources-in-the-cluster)
 
@@ -30,7 +30,7 @@
 
 - [Verification](#verification)
 
-# Introduction {#introduction}
+# Introduction
 
 This guide helps you to set up the least privileged Kubeconfig within your Kubernetes cluster. For reference, the abbreviations below are used throughout this guide:
 
@@ -46,24 +46,24 @@ This guide helps you to set up the least privileged Kubeconfig within your Kuber
 
 Throughout the guide, `rubrik-kubeconfig-user` will be the **User** associated with the Kubeconfig. We'll apply all **Role Bindings** and **Cluster Role Bindings** to this **User**.
 
-# Setting up Kubernetes (K8s) Cluster on RSC {#setting-up-kubernetes-k8s-cluster-on-rsc}
+# Setting up Kubernetes (K8s) Cluster on RSC
 
-## Prerequisites {#prerequisites}
+## Prerequisites
 
 - Before adding the cluster to RSC, ensure `rubrik-kupr` namespace does not exist in the K8s Cluster. This namespace will be created by Rubrik when the cluster is added to RSC.
 - To perform backup/recovery of PVCs, Rubrik will create one service of type LoadBalancer in the `rubrik-kupr` namespace. This Loadbalancer endpoint will be used to communicate with the Rubrik Backup Agent deployed in the K8s cluster. Ensure that LoadBalancer type service is supported on the K8s cluster.
 
-## Step 1: Create a Kubeconfig {#step-1-create-a-kubeconfig}
+## Step 1: Create a Kubeconfig
 
 You'll need to create a Kubeconfig for adding the K8s cluster to RSC. While instructions for creating a Kubeconfig using the `kubeadm kubeconfig user` tool are detailed in [Certificate Management with kubeadm | Kubernetes](https://kubernetes.io/docs/tasks/administer-cluster/kubeadm/kubeadm-certs/#kubeconfig-additional-users), it's important to note that the method for creating a Kubeconfig may differ depending on your environment. Consider your particular requirements and choose the best approach accordingly.
 
 In the following steps, we assume that the **User** associated with the Kubeconfig is called `rubrik-kubeconfig-user` and cover the required permissions for the Kubeconfig.
 
-## Step 2: Assign cluster-scoped and backup/recovery permissions to the Kubeconfig {#step-2-assign-cluster-scoped-and-backup-recovery-permissions-to-the-kubeconfig}
+## Step 2: Assign cluster-scoped and backup/recovery permissions to the Kubeconfig
 
 After creating a Kubeconfig in [Step 1](#step-1-create-a-kubeconfig), you need to assign the following permissions to the Kubeconfig:
 
-### I. Create a **ClusterRole** with the provided definition {#create-a-clusterrole-with-the-provided-definition}
+### I. Create a **ClusterRole** with the provided definition
 
 ```yaml
 # ClusterRole with permissions required by the Rubrik Kubeconfig
@@ -184,7 +184,7 @@ If you're using Red Hat OpenShift Kubernetes Clusters, these additional permissi
   verbs: ["use"]
 ```
 
-### II. Grant Kubeconfig **User** these **ClusterRole** permissions with a **ClusterRoleBinding** {#grant-kubeconfig-user-these-clusterrole-permissions-with-a-clusterrolebinding}
+### II. Grant Kubeconfig **User** these **ClusterRole** permissions with a **ClusterRoleBinding**
 
 ```yaml
 apiVersion: rbac.authorization.k8s.io/v1
@@ -201,11 +201,11 @@ subjects:
   apiGroup: rbac.authorization.k8s.io
 ```
 
-### III. Configure Backup/Recovery permissions for the Kubeconfig User {#configure-backup-recovery-permissions-for-the-kubeconfig-user}
+### III. Configure Backup/Recovery permissions for the Kubeconfig User
 
 Depending on the resources you need to protect, choose one of the following options (A, B, C) and create the respective **ClusterRoleBindings** and **RoleBindings** for your Kubeconfig **User**.
 
-#### Option A: Protection for All Resources in the Cluster {#option-a-protection-for-all-resources-in-the-cluster}
+#### Option A: Protection for All Resources in the Cluster
 
 Choose this option if all namespaces and cluster-scoped resources require protection. This setup allows `get`, `list` (for backup), and `create` (for recovery) permissions on all resources. You can achieve this by creating a **ClusterRole** and subsequently assigning these permissions to the Kubeconfig **User** via a **ClusterRoleBinding**, as outlined below.
 
@@ -236,7 +236,7 @@ subjects:
   apiGroup: rbac.authorization.k8s.io
 ```
 
-#### Option B: Protection for All Resources in Specific Namespaces {#option-b-protection-for-all-resources-in-specific-namespaces}
+#### Option B: Protection for All Resources in Specific Namespaces
 
 Choose this option if only specific namespaces require protection. This setup allows `get`, `list`, and `create` permissions on all resources within protected namespaces. You will set up a similar **ClusterRole** as in [Option A](#option-a-protection-for-all-resources-in-the-cluster), but this will be bound to the Kubeconfig **User** in each protected namespace using a **RoleBinding**.
 
@@ -272,7 +272,7 @@ subjects:
   apiGroup: rbac.authorization.k8s.io
 ```
 
-#### Option C: Protection for Specific Resources {#option-c-protection-for-specific-resources}
+#### Option C: Protection for Specific Resources
 
 Choose this option if only specific resources within a namespace require protection. This setup creates a **Role** with the required permissions for these resources and grants these permissions to the Kubeconfig **User** by using a **RoleBinding**. An example of a **Role** and **RoleBinding** are provided below.
 
@@ -318,9 +318,9 @@ subjects:
   apiGroup: rbac.authorization.k8s.io
 ```
 
-## Step 3: Add the K8s Cluster to RSC {#step-3-add-the-k8s-cluster-to-rsc}
+## Step 3: Add the K8s Cluster to RSC
 
-After ensuring permissions are set in [Step 2](#step-2-assign-cluster-scoped-and-backup-recovery-permissions-to-the-kubeconfig), use the Kubeconfig to add the K8s cluster in RSC. This will create the `rubrik-kupr` namespace in the K8s Cluster.
+After ensuring permissions are set in [Step 2](#step-2-assign-cluster-scoped-and-backuprecovery-permissions-to-the-kubeconfig), use the Kubeconfig to add the K8s cluster in RSC. This will create the `rubrik-kupr` namespace in the K8s Cluster.
 
 If you’re using an **AWS EKS** cluster, When executing the [`eksctl`](https://eksctl.io/usage/iam-identity-mappings/) command, update the `--username` argument to match the Kubeconfig **User** `rubrik-kubeconfig-user`.
 
@@ -328,7 +328,7 @@ If you’re using an **AWS EKS** cluster, When executing the [`eksctl`](https://
 eksctl create iamidentitymapping --cluster=<cluster-name> --region=<region-code> --arn=<rubrik-cloud-account-role-arn> --username=rubrik-kubeconfig-user --no-duplicate-arns
 ```
 
-## Step 4: Assign rubrik-kupr namespace permissions to the Kubeconfig {#step-4-assign-rubrik-kupr-namespace-permissions-to-the-kubeconfig}
+## Step 4: Assign rubrik-kupr namespace permissions to the Kubeconfig
 
 After the cluster is added to RSC in [Step 3](#step-3-add-the-k8s-cluster-to-rsc), make sure to update the permissions in the `rubrik-kupr` namespace by creating a new **Role** and **RoleBinding** with the provided definition.
 
@@ -374,7 +374,7 @@ subjects:
   apiGroup: rbac.authorization.k8s.io
 ```
 
-## Verification {#verification}
+## Verification
 
 After completing all the above 4 steps, the refresh of the K8s cluster should succeed.
 You can proceed to create Protection Sets and configure backups to protect the resources.
